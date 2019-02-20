@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">AndrooidImageProcessing</string>
+    <string name="select">Fotağraf Seç</string>
+    <string name="selectAction">Seçim yapınız!</string>
+    <string name="imageSaved">Fotoğraf kaydedildi!</string>
+    <string name="fail">Fotağraf kaydedilemedi!</string>
+
+</resources>
