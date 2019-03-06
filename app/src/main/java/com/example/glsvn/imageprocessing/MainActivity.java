@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
@@ -32,10 +33,12 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
-    Button galleryselect;
-    ImageView imgview;
-    Uri file;
 
+    Button galleryselect,processingbtn;
+    ImageView imgview,imgview2;
+    Uri file;
+    static Boolean mycontrol=false;
+    ImageProcessing imageprocessing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +46,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         galleryselect = findViewById(R.id.select);
         imgview = findViewById(R.id.imageView);
+        imgview2 = findViewById(R.id.imageView2);
+        processingbtn=findViewById(R.id.processingbtn);
 
-//camera permission control
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            galleryselect.setEnabled(false);
-            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE }, 0);
-        }
+        camPermission();
 
         galleryselect.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,6 +58,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        processingbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mycontrol==true)
+                {
+                imgview2.invalidate();
+                BitmapDrawable drawable = (BitmapDrawable) imgview.getDrawable();
+                Bitmap bitmap = drawable.getBitmap();
+                imgview2.setVisibility(View.VISIBLE);
+                imageprocessing=new ImageProcessing();
+                imgview2.setImageBitmap(imageprocessing.doInvert(bitmap));
+                }
+                else
+                    Toast.makeText(getBaseContext(),"Lütfen resim seçiniz!",Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void showPictureDialog(){
@@ -105,9 +122,9 @@ public class MainActivity extends AppCompatActivity {
                 Uri contentURI = data.getData();
                 try {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
-                    String path = saveImage(bitmap);
                     Toast.makeText(MainActivity.this, R.string.imageSaved, Toast.LENGTH_SHORT).show();
                     imgview.setImageBitmap(bitmap);
+                    mycontrol=true;
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -120,9 +137,17 @@ public class MainActivity extends AppCompatActivity {
             imgview.setImageBitmap(thumbnail);
             saveImage(thumbnail);
             Toast.makeText(MainActivity.this, R.string.imageSaved, Toast.LENGTH_SHORT).show();
+            mycontrol=true;
         }
     }
+    void camPermission()
+    {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            galleryselect.setEnabled(false);
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE }, 0);
+        }
 
+    }
     String saveImage(Bitmap myBitmap) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         myBitmap.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
