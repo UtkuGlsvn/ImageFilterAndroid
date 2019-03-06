@@ -4,5 +4,11 @@
     <string name="selectAction">Seçim yapınız!</string>
     <string name="imageSaved">Fotoğraf kaydedildi!</string>
     <string name="fail">Fotağraf kaydedilemedi!</string>
+    <string name="processing">İşlemi gerçekleştir</string>
+    <string name="process">Yapılacak İşlem: </string>
 
+    <string-array name="imagelist">
+        <item>Highlight Image</item>
+
+    </string-array>
 </resources>
