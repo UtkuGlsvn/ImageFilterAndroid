@@ -20,8 +20,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
@@ -36,10 +38,12 @@ public class MainActivity extends AppCompatActivity {
 
     Button galleryselect,processingbtn;
     ImageView imgview,imgview2;
+    Spinner spinner;
     Uri file;
     static Boolean mycontrol=false;
     ImageProcessing imageprocessing;
 
+    int no=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         imgview = findViewById(R.id.imageView);
         imgview2 = findViewById(R.id.imageView2);
         processingbtn=findViewById(R.id.processingbtn);
+        spinner = findViewById(R.id.spinner);
 
         camPermission();
 
@@ -58,17 +63,31 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                no=position;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         processingbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(mycontrol==true)
                 {
-                imgview2.invalidate();
+                imgview.invalidate();
                 BitmapDrawable drawable = (BitmapDrawable) imgview.getDrawable();
-                Bitmap bitmap = drawable.getBitmap();
+                final Bitmap bitmap = drawable.getBitmap();
                 imgview2.setVisibility(View.VISIBLE);
                 imageprocessing=new ImageProcessing();
-                imgview2.setImageBitmap(imageprocessing.doInvert(bitmap));
+                imgview2.setImageBitmap(imageprocessing.choseeProcces(no,bitmap));
+
+
                 }
                 else
                     Toast.makeText(getBaseContext(),"Lütfen resim seçiniz!",Toast.LENGTH_SHORT).show();

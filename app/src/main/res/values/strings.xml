@@ -9,6 +9,8 @@
 
     <string-array name="imagelist">
         <item>Highlight Image</item>
-
+        <item>Invert Image</item>
+        <item>GreyScale Image</item>
+        <item>BlackFilter Image</item>
     </string-array>
 </resources>

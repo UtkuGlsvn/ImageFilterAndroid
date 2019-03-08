@@ -7,8 +7,22 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 
+import java.util.Random;
+
 public class ImageProcessing {
 
+    public Bitmap choseeProcces(int no,Bitmap src)
+    {
+        switch (no)
+        {
+            case 0: return doHighlightImage(src);
+            case 1: return doInvert(src);
+            case 2: return doGreyscale(src);
+            case 3: return applyBlackFilter(src);
+
+        }
+        return null;
+    }
     public  Bitmap doHighlightImage(Bitmap src) {
         // create new bitmap, which will be painted and becomes result image
         Bitmap bmOut = Bitmap.createBitmap(src.getWidth(), src.getHeight(), Bitmap.Config.ARGB_8888);
@@ -66,6 +80,76 @@ public class ImageProcessing {
         }
 
         // return final bitmap
+        return bmOut;
+    }
+
+    public Bitmap doGreyscale(Bitmap src) {
+        // constant factors
+        final double GS_RED = 0.299;
+        final double GS_GREEN = 0.587;
+        final double GS_BLUE = 0.114;
+
+        // create output bitmap
+        Bitmap bmOut = Bitmap.createBitmap(src.getWidth(), src.getHeight(), src.getConfig());
+        // pixel information
+        int A, R, G, B;
+        int pixel;
+
+        // get image size
+        int width = src.getWidth();
+        int height = src.getHeight();
+
+        // scan through every single pixel
+        for(int x = 0; x < width; ++x) {
+            for(int y = 0; y < height; ++y) {
+                // get one pixel color
+                pixel = src.getPixel(x, y);
+                // retrieve color of all channels
+                A = Color.alpha(pixel);
+                R = Color.red(pixel);
+                G = Color.green(pixel);
+                B = Color.blue(pixel);
+                // take conversion up to one single value
+                R = G = B = (int)(GS_RED * R + GS_GREEN * G + GS_BLUE * B);
+                // set new pixel color to output bitmap
+                bmOut.setPixel(x, y, Color.argb(A, R, G, B));
+            }
+        }
+
+        // return final image
+        return bmOut;
+    }
+
+    public static Bitmap applyBlackFilter(Bitmap source) {
+        // get image size
+        int width = source.getWidth();
+        int height = source.getHeight();
+        int[] pixels = new int[width * height];
+        // get pixel array from source
+        source.getPixels(pixels, 0, width, 0, 0, width, height);
+        // random object
+        Random random = new Random();
+
+        int R, G, B, index = 0, thresHold = 0;
+        // iteration through pixels
+        for(int y = 0; y < height; ++y) {
+            for(int x = 0; x < width; ++x) {
+                // get current index in 2D-matrix
+                index = y * width + x;
+                // get color
+                R = Color.red(pixels[index]);
+                G = Color.green(pixels[index]);
+                B = Color.blue(pixels[index]);
+                // generate threshold
+                thresHold = random.nextInt(0xFF);
+                if(R < thresHold && G < thresHold && B < thresHold) {
+                    pixels[index] = Color.rgb(0x00, 0x00, 0x00);
+                }
+            }
+        }
+        // output bitmap
+        Bitmap bmOut = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        bmOut.setPixels(pixels, 0, width, 0, 0, width, height);
         return bmOut;
     }
 
