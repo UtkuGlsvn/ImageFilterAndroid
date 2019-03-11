@@ -11,6 +11,8 @@ import java.util.Random;
 
 public class ImageProcessing {
 
+    private static final int COLOR_MAX = 0xff;
+    private static final int COLOR_MIN =0x00 ;
     public Bitmap choseeProcces(int no,Bitmap src)
     {
         switch (no)
@@ -19,7 +21,11 @@ public class ImageProcessing {
             case 1: return doInvert(src);
             case 2: return doGreyscale(src);
             case 3: return applyBlackFilter(src);
-
+            case 4: return applySnowEffect(src);
+            case 5:return applyHueFilter(src);
+            case 6: return applyShadingFilterRed(src);
+            case 7: return applyShadingFilterBlue(src);
+            case 8: return applyShadingFilterGreen(src);
         }
         return null;
     }
@@ -141,10 +147,145 @@ public class ImageProcessing {
                 G = Color.green(pixels[index]);
                 B = Color.blue(pixels[index]);
                 // generate threshold
-                thresHold = random.nextInt(0xFF);
+                thresHold = random.nextInt(COLOR_MAX);
                 if(R < thresHold && G < thresHold && B < thresHold) {
-                    pixels[index] = Color.rgb(0x00, 0x00, 0x00);
+                    pixels[index] = Color.rgb(COLOR_MIN, COLOR_MIN, COLOR_MIN);
                 }
+            }
+        }
+        // output bitmap
+        Bitmap bmOut = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        bmOut.setPixels(pixels, 0, width, 0, 0, width, height);
+        return bmOut;
+    }
+
+    public  Bitmap applySnowEffect(Bitmap source) {
+        // get image size
+        int width = source.getWidth();
+        int height = source.getHeight();
+        int[] pixels = new int[width * height];
+        // get pixel array from source
+        source.getPixels(pixels, 0, width, 0, 0, width, height);
+        // random object
+        Random random = new Random();
+
+        int R, G, B, index = 0, thresHold = 50;
+        // iteration through pixels
+        for(int y = 0; y < height; ++y) {
+            for(int x = 0; x < width; ++x) {
+                // get current index in 2D-matrix
+                index = y * width + x;
+                // get color
+                R = Color.red(pixels[index]);
+                G = Color.green(pixels[index]);
+                B = Color.blue(pixels[index]);
+                // generate threshold
+                thresHold = random.nextInt(COLOR_MAX);
+                if(R > thresHold && G > thresHold && B > thresHold) {
+                    pixels[index] = Color.rgb(COLOR_MAX, COLOR_MAX, COLOR_MAX);
+                }
+            }
+        }
+        // output bitmap
+        Bitmap bmOut = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+        bmOut.setPixels(pixels, 0, width, 0, 0, width, height);
+        return bmOut;
+    }
+
+    public static Bitmap applyHueFilter(Bitmap source) {
+        // get image size
+        int width = source.getWidth();
+        int height = source.getHeight();
+        int[] pixels = new int[width * height];
+        float[] HSV = new float[3];
+        // get pixel array from source
+        source.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        int index = 0;
+        // iteration through pixels
+        for(int y = 0; y < height; ++y) {
+            for(int x = 0; x < width; ++x) {
+                // get current index in 2D-matrix
+                index = y * width + x;
+                // convert to HSV
+                Color.colorToHSV(pixels[index], HSV);
+                // increase Saturation level=9
+                HSV[0] *= 9;
+                HSV[0] = (float) Math.max(0.0, Math.min(HSV[0], 360.0));
+                // take color back
+                pixels[index] |= Color.HSVToColor(HSV);
+            }
+        }
+        // output bitmap
+        Bitmap bmOut = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        bmOut.setPixels(pixels, 0, width, 0, 0, width, height);
+        return bmOut;
+    }
+
+    public Bitmap applyShadingFilterRed(Bitmap source) {
+        // get image size
+        int width = source.getWidth();
+        int height = source.getHeight();
+        int[] pixels = new int[width * height];
+        // get pixel array from source
+        source.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        int index = 0;
+        // iteration through pixels
+        for(int y = 0; y < height; ++y) {
+            for(int x = 0; x < width; ++x) {
+                // get current index in 2D-matrix
+                index = y * width + x;
+                // AND
+                pixels[index] &= Color.RED;
+            }
+        }
+        // output bitmap
+        Bitmap bmOut = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        bmOut.setPixels(pixels, 0, width, 0, 0, width, height);
+        return bmOut;
+    }
+
+    public Bitmap applyShadingFilterBlue(Bitmap source) {
+        // get image size
+        int width = source.getWidth();
+        int height = source.getHeight();
+        int[] pixels = new int[width * height];
+        // get pixel array from source
+        source.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        int index = 0;
+        // iteration through pixels
+        for(int y = 0; y < height; ++y) {
+            for(int x = 0; x < width; ++x) {
+                // get current index in 2D-matrix
+                index = y * width + x;
+                // AND
+                pixels[index] &= Color.BLUE;
+            }
+        }
+        // output bitmap
+        Bitmap bmOut = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        bmOut.setPixels(pixels, 0, width, 0, 0, width, height);
+        return bmOut;
+    }
+
+    public Bitmap applyShadingFilterGreen(Bitmap source) {
+        // get image size
+        int width = source.getWidth();
+        int height = source.getHeight();
+        int[] pixels = new int[width * height];
+        // get pixel array from source
+        source.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        int index = 0;
+        // iteration through pixels
+        for(int y = 0; y < height; ++y) {
+            for(int x = 0; x < width; ++x) {
+                // get current index in 2D-matrix
+                index = y * width + x;
+                // AND
+                pixels[index] &= Color.GREEN;
             }
         }
         // output bitmap

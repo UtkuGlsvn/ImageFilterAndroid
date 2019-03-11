@@ -15,5 +15,10 @@
         <item>Invert Image</item>
         <item>GreyScale Image</item>
         <item>BlackFilter Image</item>
+        <item>Snow Effect</item>
+        <item>Hue Filter</item>
+        <item>Shading Filter Red</item>
+        <item>Shading Filter Blue</item>
+        <item>Shading Filter Green</item>
     </string-array>
 </resources>

@@ -2,8 +2,6 @@ package com.example.glsvn.imageprocessing;
 
 import android.Manifest;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -41,8 +39,6 @@ public class MainActivity extends AppCompatActivity {
     static Boolean mycontrol = false;
     ImageProcessing imageprocessing;
     ProgressDialog progressDialog;
-    //screen eklencek, save button bitecek
-
 
     int no = 0;
 
@@ -56,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         processingbtn = findViewById(R.id.processingbtn);
         spinner = findViewById(R.id.spinner);
 
-        progressDialog = new ProgressDialog(this);
+
         camPermission();
 
         galleryselect.setOnClickListener(new View.OnClickListener() {
@@ -82,24 +78,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (mycontrol == true) {
-                    progressDialog.setMessage("loading!");
-                    progressDialog.show();
+
                     imgview.invalidate();
                     BitmapDrawable drawable = (BitmapDrawable) imgview.getDrawable();
                     Bitmap bitmap = drawable.getBitmap();
                     imgview2.setVisibility(View.VISIBLE);
                     imageprocessing = new ImageProcessing();
                     imgview2.setImageBitmap(imageprocessing.choseeProcces(no, bitmap));
-                    progressDialog.dismiss();
-                } else
+
+                } else {
                     Toast.makeText(getBaseContext(), "Lütfen resim seçiniz!", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 
         imgview2.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if (mycontrol == true) {
                     AlertDialog.Builder mydialog= new AlertDialog.Builder(MainActivity.this);
                     mydialog.setTitle(R.string.app_name);
                     mydialog.setMessage(R.string.saveImage);
@@ -120,9 +116,6 @@ public class MainActivity extends AppCompatActivity {
                     });
                     mydialog.show();
                     return true;
-                }
-                else
-                    return false;
 
             }
         });
