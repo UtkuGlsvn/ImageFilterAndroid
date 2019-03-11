@@ -1,12 +1,13 @@
 package com.example.glsvn.imageprocessing;
 
 import android.Manifest;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
@@ -14,7 +15,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,20 +30,22 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button galleryselect,processingbtn;
-    ImageView imgview,imgview2;
+    Button galleryselect, processingbtn;
+    ImageView imgview, imgview2;
     Spinner spinner;
     Uri file;
-    static Boolean mycontrol=false;
+    static Boolean mycontrol = false;
     ImageProcessing imageprocessing;
+    ProgressDialog progressDialog;
+    //screen eklencek, save button bitecek
 
-    int no=0;
+
+    int no = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,9 +53,10 @@ public class MainActivity extends AppCompatActivity {
         galleryselect = findViewById(R.id.select);
         imgview = findViewById(R.id.imageView);
         imgview2 = findViewById(R.id.imageView2);
-        processingbtn=findViewById(R.id.processingbtn);
+        processingbtn = findViewById(R.id.processingbtn);
         spinner = findViewById(R.id.spinner);
 
+        progressDialog = new ProgressDialog(this);
         camPermission();
 
         galleryselect.setOnClickListener(new View.OnClickListener() {
@@ -66,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                no=position;
+                no = position;
             }
 
             @Override
@@ -78,29 +81,60 @@ public class MainActivity extends AppCompatActivity {
         processingbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mycontrol==true)
-                {
-                imgview.invalidate();
-                BitmapDrawable drawable = (BitmapDrawable) imgview.getDrawable();
-                final Bitmap bitmap = drawable.getBitmap();
-                imgview2.setVisibility(View.VISIBLE);
-                imageprocessing=new ImageProcessing();
-                imgview2.setImageBitmap(imageprocessing.choseeProcces(no,bitmap));
+                if (mycontrol == true) {
+                    progressDialog.setMessage("loading!");
+                    progressDialog.show();
+                    imgview.invalidate();
+                    BitmapDrawable drawable = (BitmapDrawable) imgview.getDrawable();
+                    Bitmap bitmap = drawable.getBitmap();
+                    imgview2.setVisibility(View.VISIBLE);
+                    imageprocessing = new ImageProcessing();
+                    imgview2.setImageBitmap(imageprocessing.choseeProcces(no, bitmap));
+                    progressDialog.dismiss();
+                } else
+                    Toast.makeText(getBaseContext(), "Lütfen resim seçiniz!", Toast.LENGTH_SHORT).show();
+            }
+        });
 
+        imgview2.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (mycontrol == true) {
+                    AlertDialog.Builder mydialog= new AlertDialog.Builder(MainActivity.this);
+                    mydialog.setTitle(R.string.app_name);
+                    mydialog.setMessage(R.string.saveImage);
+                    mydialog.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            BitmapDrawable drawable = (BitmapDrawable) imgview2.getDrawable();
+                            Bitmap bitmap = drawable.getBitmap();
+                            saveImage(bitmap);
+                            Toast.makeText(getBaseContext(), "Resim Kaydedildi!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    mydialog.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
+                        }
+                    });
+                    mydialog.show();
+                    return true;
                 }
                 else
-                    Toast.makeText(getBaseContext(),"Lütfen resim seçiniz!",Toast.LENGTH_SHORT).show();
+                    return false;
+
             }
         });
     }
 
-    private void showPictureDialog(){
+
+    private void showPictureDialog() {
         AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this);
         pictureDialog.setTitle(R.string.selectAction);
         String[] pictureDialogItems = {
                 "Galeriden fotağraf seçiniz",
-                "Kameradan fotağraf seçiniz" };
+                "Kameradan fotağraf seçiniz"};
         pictureDialog.setItems(pictureDialogItems,
                 new DialogInterface.OnClickListener() {
                     @Override
@@ -117,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 });
         pictureDialog.show();
     }
+
     void choosePhotoFromGallary() {
         Intent galleryIntent = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -143,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
                     Toast.makeText(MainActivity.this, R.string.imageSaved, Toast.LENGTH_SHORT).show();
                     imgview.setImageBitmap(bitmap);
-                    mycontrol=true;
+                    mycontrol = true;
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -156,17 +191,18 @@ public class MainActivity extends AppCompatActivity {
             imgview.setImageBitmap(thumbnail);
             saveImage(thumbnail);
             Toast.makeText(MainActivity.this, R.string.imageSaved, Toast.LENGTH_SHORT).show();
-            mycontrol=true;
+            mycontrol = true;
         }
     }
-    void camPermission()
-    {
+
+    void camPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             galleryselect.setEnabled(false);
-            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE }, 0);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
         }
 
     }
+
     String saveImage(Bitmap myBitmap) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         myBitmap.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
@@ -191,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
             return f.getAbsolutePath();
         } catch (IOException ex) {
             ex.printStackTrace();
-            Log.w("error",ex.toString());
+            Log.w("error", ex.toString());
         }
         return "";
     }

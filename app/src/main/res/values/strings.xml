@@ -5,7 +5,10 @@
     <string name="imageSaved">Fotoğraf kaydedildi!</string>
     <string name="fail">Fotağraf kaydedilemedi!</string>
     <string name="processing">İşlemi gerçekleştir</string>
+    <string name="saveImage">Resim Kaydedilsin mi</string>
     <string name="process">Yapılacak İşlem: </string>
+    <string name="yes">Evet</string>
+    <string name="no">Hayır</string>
 
     <string-array name="imagelist">
         <item>Highlight Image</item>

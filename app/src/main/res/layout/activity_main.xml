@@ -13,8 +13,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="@string/select"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="5dp"
         android:textSize="20sp" />
     <TextView
         android:layout_width="wrap_content"
@@ -25,12 +23,12 @@
     <ImageView
         android:layout_gravity="center"
         android:id="@+id/imageView"
-        android:layout_width="300dp"
+        android:layout_width="wrap_content"
         android:layout_height="125dp"
         android:src="@drawable/ic_launcher_background" >
     </ImageView>
 <LinearLayout
-    android:layout_marginTop="15dp"
+    android:layout_marginTop="10dp"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -55,7 +53,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="@string/processing"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="5dp"
         android:textSize="20sp" />
     <TextView
         android:layout_width="wrap_content"
@@ -70,4 +68,5 @@
         android:layout_width="300dp"
         android:layout_height="150dp"
         android:src="@drawable/ic_launcher_background" />
+
 </android.widget.LinearLayout>
